@@ -6,10 +6,12 @@ using UnityEngine;
 public class Rocket : MonoBehaviour {
 
     Rigidbody rigidBody;
+    AudioSource audioSource;
 
 	// Use this for initialization
 	void Start () {
         rigidBody = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
 	}
 	
 	// Update is called once per frame
@@ -22,14 +24,24 @@ public class Rocket : MonoBehaviour {
         if(Input.GetKey(KeyCode.Space)) //can thrust while rotating
         {
             rigidBody.AddRelativeForce(Vector3.up);
+            if(!audioSource.isPlaying)
+            {
+                audioSource.Play();
+            }
         }
-        if (Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
+        else
         {
-            print("left rotation");
+            audioSource.Stop();
+        }
+        if (Input.GetKey(KeyCode.A))
+        {
+            transform.Rotate(Vector3.forward);
         }
         else if(Input.GetKey(KeyCode.D))
         {
-            print("right rotation");
+            transform.Rotate(-Vector3.forward);
         }
+
+       
     }
 }
