@@ -7,7 +7,8 @@ public class Rocket : MonoBehaviour {
 
     Rigidbody rigidBody;
     AudioSource audioSource;
-    float rcsThrust = 200f;
+    [SerializeField] float rcsThrust = 200f;
+    [SerializeField] float linearThrust = 200f;
 
     // Use this for initialization
     void Start () {
@@ -21,11 +22,31 @@ public class Rocket : MonoBehaviour {
         Rotate();
     }
 
+    void OnCollisionEnter(Collision collision)
+    {
+       switch(collision.gameObject.tag)
+        {
+            case "Friendly":
+                print ("friendly collision");
+                break;
+            case "Fuel":
+                print("fuel collision");
+                break;
+
+            default:
+                print("dead");
+                break;
+        }
+            
+    }
+
     private void Thrust()
     {
+        //float thrustThisFrame = linearThrust * Time.deltaTime;
+
         if (Input.GetKey(KeyCode.Space)) //can thrust while rotating
         {
-            rigidBody.AddRelativeForce(Vector3.up);
+            rigidBody.AddRelativeForce(Vector3.up * linearThrust);
             if (!audioSource.isPlaying)
             {
                 audioSource.Play();
