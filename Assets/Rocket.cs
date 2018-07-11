@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class Rocket : MonoBehaviour {
 
     Rigidbody rigidBody;
     AudioSource audioSource;
+    enum State { Alive, Dying, Transcending }
+    State state = State.Alive;
+
     [SerializeField] float rcsThrust = 200f;
     [SerializeField] float linearThrust = 200f;
 
@@ -27,17 +30,22 @@ public class Rocket : MonoBehaviour {
        switch(collision.gameObject.tag)
         {
             case "Friendly":
-                print ("friendly collision");
                 break;
-            case "Fuel":
-                print("fuel collision");
+            case "Finish":
+                Invoke("LoadNextScene", 1f);
                 break;
 
             default:
                 print("dead");
+                SceneManager.LoadScene(0);
                 break;
         }
             
+    }
+
+    private void LoadNextScene()
+    {
+        SceneManager.LoadScene(1); //todo allow for more than 2 levels
     }
 
     private void Thrust()
