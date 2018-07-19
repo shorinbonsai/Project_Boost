@@ -10,6 +10,8 @@ public class Rocket : MonoBehaviour {
     enum State {Alive, Dying, Transcending}
     State state = State.Alive;
 
+    bool collisionsDisabled = false;
+
     [SerializeField] float rcsThrust = 200f;
     [SerializeField] float linearThrust = 200f;
     [SerializeField] AudioClip mainEngine;
@@ -32,16 +34,32 @@ public class Rocket : MonoBehaviour {
         { 
         RespondToThrustInput();
         RespondToRotateInput();
-            
+        }
+        if (Debug.isDebugBuild)
+        {
+            RespondToDebugInput();
+        }
+    }
+
+    private void RespondToDebugInput()
+    {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            LoadNextLevel();
+        }
+        else if (Input.GetKeyDown(KeyCode.C))
+        {
+            collisionsDisabled = !collisionsDisabled; //toggle
         }
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        if(state != State.Alive)
+        if(state != State.Alive || collisionsDisabled)
         {
             return;
         }
+        
 
        switch(collision.gameObject.tag)
         {
@@ -53,7 +71,6 @@ public class Rocket : MonoBehaviour {
 
             default:
                 StartDeathSequence();
-
                 break;
         }
             
@@ -84,12 +101,20 @@ public class Rocket : MonoBehaviour {
 
     private void LoadNextLevel()
     {
-        SceneManager.LoadScene(1); //todo allow for more than 2 levels
+        int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        int nextSceneIndex = currentSceneIndex + 1;
+        if(nextSceneIndex < SceneManager.sceneCountInBuildSettings)
+        {
+            SceneManager.LoadScene(nextSceneIndex);
+        }
+        else
+        {
+            LoadFirstLevel();
+        }
     }
 
     private void RespondToThrustInput()
     {
-        //float thrustThisFrame = linearThrust * Time.deltaTime;
 
         if (Input.GetKey(KeyCode.Space)) //can thrust while rotating
         {
@@ -101,6 +126,8 @@ public class Rocket : MonoBehaviour {
             mainEngineParticles.Stop();
         }
     }
+
+    
 
     private void ApplyThrust()
     {
